@@ -8,6 +8,10 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+  USER_TYPE = (
+     ('admin', 'admin'),
+     ('subscriber', 'subscriber'),
+  )
 
   email = models.EmailField( unique=True, max_length=254)
   username = models.CharField(unique=True, max_length=50)
@@ -16,6 +20,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   gender = models.CharField(max_length=20, null=True, blank=True)
   phone = models.CharField(max_length=15, null=True, blank=True)
   is_email_verified = models.BooleanField(default=False)
+  status = models.CharField(blank=True, null=True, choices = USER_TYPE, max_length=10, default='subscriber')
 
   is_staff = models.BooleanField(default=False)
   is_active = models.BooleanField(default=True)

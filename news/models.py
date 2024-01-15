@@ -4,7 +4,7 @@ from account.models import CustomUser
 
 # Create your models here.
 class Category(models.Model):
-  name = models.CharField(max_length=50)
+  name = models.CharField(max_length=50, unique=True)
   slug =  models.SlugField(null=True, blank=True, unique=True)
 
   def save(self, *args, **kwargs):

@@ -81,7 +81,6 @@ class RegistrationAPIView(APIView):
 
 class LoginAPIView(APIView):
   def post(self, request):
-    print(request.data)
     try:
       rd = request.data
       if 'email' not in rd or 'password' not in rd:
@@ -92,7 +91,8 @@ class LoginAPIView(APIView):
       email = rd['email']
       password = rd['password']
       user = authenticate(request, email=email, password=password)
-      if user is not None:
+      print()
+      if user is not None and user.is_email_verified:
         login(request, user=user)
         token = helper.get_tokens_for_user(user)
         return Response({
