@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # custom app
-    'account'
+    'account',
+    'news'
 ]
 
 MIDDLEWARE = [
