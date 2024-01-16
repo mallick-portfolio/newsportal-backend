@@ -19,6 +19,78 @@ from django.shortcuts import get_object_or_404
 
 
 
+class NewsAPIView(APIView):
+  permission_classes=[IsAuthenticated]
+  authentication_classes = [JWTAuthentication]
+
+  def get(self, request):
+    try:
+      categories = Category.objects.all()
+      data = CategorySerializer(categories, many=True).data
+      return Response({
+          "success": True,
+          "message": "Categories retrived successfully!!!",
+          "error": False,
+          "data": data
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
+  @method_decorator(helpers.admin_only)
+  def post(self, request):
+    try:
+      data = request.data
+      category_id = data.pop('category')
+      category = Category.objects.get(id=category_id)
+      serializer = NewsSerializer(data=request.data)
+      print(data)
+      if serializer.is_valid():
+        serializer.save(author=request.user, category=category)
+        return Response({
+          "success": True,
+          "message": "Post created!!!",
+          "error": False,
+          "data": serializer.data
+        }, status=status.HTTP_200_OK)
+      else:
+        return Response({
+          "success": False,
+          "message": "Post already exit with this name. ",
+          "error": True,
+          "ta": serializer.errors
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
+
+  @method_decorator(helpers.admin_only)
+  def delete(self, request, id):
+    try:
+      category = Category.objects.filter(id=id).first()
+      if category is not None:
+        category.delete()
+        return Response({
+            "success": True,
+            "message": "Category deleted successfully!!!",
+            "error": False,
+          }, status=status.HTTP_200_OK)
+      else:
+        return Response({
+            "success": False,
+            "message": "Failed to delete category!!!",
+            "error": False,
+          }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
 class CategoryAPIView(APIView):
   permission_classes=[IsAuthenticated]
   authentication_classes = [JWTAuthentication]
@@ -54,9 +126,9 @@ class CategoryAPIView(APIView):
       else:
         return Response({
           "success": False,
-          "message": serializer.errors,
+          "message": "Category already exit with this name. ",
           "error": True,
-        }, status=status.HTTP_400_BAD_REQUEST)
+        }, status=status.HTTP_200_OK)
     except Exception as e:
       return Response({
           "error": f'Error is {e}',
