@@ -91,8 +91,9 @@ class LoginAPIView(APIView):
       email = rd['email']
       password = rd['password']
       user = authenticate(request, email=email, password=password)
-      print()
+      print(user)
       if user is not None and user.is_email_verified:
+        print(user)
         login(request, user=user)
         token = helper.get_tokens_for_user(user)
         return Response({
@@ -101,9 +102,11 @@ class LoginAPIView(APIView):
           "token": token
         })
       else:
+        print("else block")
         return Response({
           "success": False,
           'message': "Invalid Credentials",
+          "error": True
         })
 
     except Exception as e:

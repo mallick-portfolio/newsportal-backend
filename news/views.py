@@ -43,10 +43,11 @@ class NewsAPIView(APIView):
   def post(self, request):
     try:
       data = request.data
-      category_id = data.pop('category')
+      category_id = data.get('category')
       category = Category.objects.get(id=category_id)
       serializer = NewsSerializer(data=request.data)
-      print(data)
+
+
       if serializer.is_valid():
         serializer.save(author=request.user, category=category)
         return Response({
@@ -56,6 +57,7 @@ class NewsAPIView(APIView):
           "data": serializer.data
         }, status=status.HTTP_200_OK)
       else:
+        print(serializer.errors)
         return Response({
           "success": False,
           "message": "Post already exit with this name. ",
