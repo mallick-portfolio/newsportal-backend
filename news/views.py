@@ -8,8 +8,8 @@ import random
 from rest_framework.decorators import (api_view, permission_classes, authentication_classes)
 from rest_framework.permissions import IsAuthenticated
 from account.models import CustomUser
-from news.models import News, Category
-from news.serializers import NewsSerializer, CategorySerializer
+from news.models import Post, Category
+from news.serializers import PostSerializer, CategorySerializer, PostAttachmentSerializer
 import traceback
 from account.helper import email_template
 from account import helper
@@ -18,21 +18,59 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 
 
+class PostAttachmentAPIView(APIView):
+  def post(self, request):
+    try:
+      data = request.data
+      serializer = PostAttachmentSerializer(data=request.data)
+      if serializer.is_valid():
+        serializer.save()
+        return Response({
+            "success": True,
+            "message": "Attachment uploaded!!!",
+            "error": False,
+            "data": serializer.data
+          }, status=status.HTTP_200_OK)
+      else:
+        return Response({
+            "success": False,
+            "message": "Attachment failed!!!",
+            "error": True,
+            "data": serializer.errors
+          }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
 
 class NewsAPIView(APIView):
   permission_classes=[IsAuthenticated]
   authentication_classes = [JWTAuthentication]
 
-  def get(self, request):
+  @method_decorator(helpers.admin_only)
+  def get(self, request, id=None):
     try:
-      categories = Category.objects.all()
-      data = CategorySerializer(categories, many=True).data
-      return Response({
-          "success": True,
-          "message": "Categories retrived successfully!!!",
-          "error": False,
-          "data": data
-        }, status=status.HTTP_200_OK)
+      if id is not None:
+        post = Post.objects.filter(id=id).first()
+        data = PostSerializer(post).data
+        return Response({
+            "success": True,
+            "message": "Post retrived successfully!!!",
+            "error": False,
+            "data": data
+          }, status=status.HTTP_200_OK)
+      else:
+        posts = Post.objects.all()
+        data = PostSerializer(posts, many=True).data
+        return Response({
+            "success": True,
+            "message": "Posts retrived successfully!!!",
+            "error": False,
+            "data": data
+          }, status=status.HTTP_200_OK)
     except Exception as e:
       return Response({
           "error": f'Error is {e}',
@@ -45,8 +83,7 @@ class NewsAPIView(APIView):
       data = request.data
       category_id = data.get('category')
       category = Category.objects.get(id=category_id)
-      serializer = NewsSerializer(data=request.data)
-
+      serializer = PostSerializer(data=request.data)
 
       if serializer.is_valid():
         serializer.save(author=request.user, category=category)
@@ -57,13 +94,44 @@ class NewsAPIView(APIView):
           "data": serializer.data
         }, status=status.HTTP_200_OK)
       else:
-        print(serializer.errors)
         return Response({
           "success": False,
-          "message": "Post already exit with this name. ",
+          "message": "Something want wrong",
           "error": True,
-          "ta": serializer.errors
         }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
+
+  @method_decorator(helpers.admin_only)
+  def put(self, request, id):
+    try:
+      post = Post.objects.filter(id=id).first()
+      if post is not None:
+        serializer = PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+          serializer.save()
+          return Response({
+            "success": True,
+            "message": "Post updated successfully!!!",
+            "error": False,
+            "data": serializer.data
+          }, status=status.HTTP_200_OK)
+        else:
+          return Response({
+            "success": False,
+            "message": "Failed to update post!!!",
+            "error": True,
+          }, status=status.HTTP_200_OK)
+      else:
+        return Response({
+            "success": False,
+            "message": "Invalid post id!!!",
+            "error": True,
+          }, status=status.HTTP_200_OK)
     except Exception as e:
       return Response({
           "error": f'Error is {e}',
@@ -74,18 +142,18 @@ class NewsAPIView(APIView):
   @method_decorator(helpers.admin_only)
   def delete(self, request, id):
     try:
-      category = Category.objects.filter(id=id).first()
-      if category is not None:
-        category.delete()
+      post = Post.objects.filter(id=id).first()
+      if post is not None:
+        post.delete()
         return Response({
             "success": True,
-            "message": "Category deleted successfully!!!",
+            "message": "Post deleted successfully!!!",
             "error": False,
           }, status=status.HTTP_200_OK)
       else:
         return Response({
             "success": False,
-            "message": "Failed to delete category!!!",
+            "message": "Failed to delete post!!!",
             "error": False,
           }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -93,6 +161,71 @@ class NewsAPIView(APIView):
           "error": f'Error is {e}',
           'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
         })
+
+
+class PublicPostAPIView(APIView):
+
+  def get(self, request, id=None):
+    try:
+      if id is not None:
+        post = Post.objects.filter(id=id).first()
+        data = PostSerializer(post).data
+        return Response({
+            "success": True,
+            "message": "Post retrived successfully!!!",
+            "error": False,
+            "data": data
+          }, status=status.HTTP_200_OK)
+      else:
+        category = request.query_params.get('category')
+        if category is not None:
+          posts = Post.objects.filter(category__name=category)
+        else:
+          posts = Post.objects.all()
+        data = PostSerializer(posts, many=True).data
+        return Response({
+            "success": True,
+            "message": "Posts retrived successfully!!!",
+            "error": False,
+            "data": data
+          }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
+
+class PublicCategoryAPIView(APIView):
+
+  def get(self, request, id=None):
+    try:
+      if id is not None:
+        category = Category.objects.filter(id=id).first()
+        data = CategorySerializer(category).data
+        return Response({
+            "success": True,
+            "message": "Post retrived successfully!!!",
+            "error": False,
+            "data": data
+          }, status=status.HTTP_200_OK)
+      else:
+        category = Category.objects.all()
+        data = CategorySerializer(category, many=True).data
+        return Response({
+            "success": True,
+            "message": "Posts retrived successfully!!!",
+            "error": False,
+            "data": data
+          }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
+
+
 class CategoryAPIView(APIView):
   permission_classes=[IsAuthenticated]
   authentication_classes = [JWTAuthentication]
