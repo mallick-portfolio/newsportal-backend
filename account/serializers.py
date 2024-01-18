@@ -4,7 +4,7 @@ from account.models import CustomUser
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = CustomUser
-    fields = ['id', 'first_name', 'last_name', 'phone', 'email', 'gender']
+    fields = ['id', 'first_name', 'last_name', 'phone', 'email', 'gender', 'status']
 
 class RegistrationSerializer(serializers.ModelSerializer):
   password2 = serializers.CharField(style={"input_type": 'password'}, write_only=True)
@@ -25,7 +25,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     gender = self.validated_data['gender']
     password = self.validated_data['password']
     password2 = self.validated_data['password2']
-    user = CustomUser(email=email, username=username, first_name=first_name, last_name=last_name,  gender=gender)
+    user = CustomUser(email=email, username=username, first_name=first_name, last_name=last_name,  gender=gender, status="subscriber")
 
     if password != password2:
       raise serializers.ValidationError({'password': 'Passwords must match.'})

@@ -91,9 +91,7 @@ class LoginAPIView(APIView):
       email = rd['email']
       password = rd['password']
       user = authenticate(request, email=email, password=password)
-      print(user)
       if user is not None and user.is_email_verified:
-        print(user)
         login(request, user=user)
         token = helper.get_tokens_for_user(user)
         return Response({
@@ -102,7 +100,6 @@ class LoginAPIView(APIView):
           "token": token
         })
       else:
-        print("else block")
         return Response({
           "success": False,
           'message': "Invalid Credentials",
@@ -129,8 +126,9 @@ class MeAPI(APIView):
 
   def get(self, request):
     try:
-      user = CustomUser.objects.filter(email=request.user.email).values('id', 'first_name', 'last_name', 'phone', 'email', 'gender').first()
+      user = CustomUser.objects.filter(email=request.user.email).first()
       data = UserSerializer(user, many=False).data
+      print(data)
 
       if user is not None:
         return Response({

@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from news.models import Post, Category, PostAttachment
+from news.models import Post, Category, PostAttachment, PostRating
 from account.serializers import UserSerializer
 from account.models import CustomUser
 
+
+
+class PostRatingSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = PostRating
+    fields = "__all__"
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -19,6 +25,7 @@ class PostAttachmentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField('get_category')
     author = serializers.SerializerMethodField('get_author')
+    post_rating = PostRatingSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post

@@ -34,4 +34,9 @@ class Post(models.Model):
     self.slug = slugify(self.title, allow_unicode=True)
     return super(Post, self).save(*args, **kwargs)
 
+class PostRating(models.Model):
+  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_rating')
+  rating = models.IntegerField()
+  comment = models.TextField(blank=True, null=True)
+  post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_rating')
 

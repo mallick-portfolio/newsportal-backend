@@ -7,6 +7,7 @@ urlpatterns = [
     path("<int:id>/", views.NewsAPIView.as_view(), name="NewsAPIViewDetails"),
     path("public/", views.PublicPostAPIView.as_view(), name="PublicPostAPIView"),
     path("public/<int:id>/", views.PublicPostAPIView.as_view(), name="PublicPostAPIView"),
+    path("public/<int:id>/rating/", views.PostRatingAPIView.as_view(), name="PostRatingAPIView"),
     path("public/category/", views.PublicCategoryAPIView.as_view(), name="PublicCategoryAPIView"),
     path("attachment/", views.PostAttachmentAPIView.as_view(), name="PostAttachmentAPIView"),
     path("category/", views.CategoryAPIView.as_view(), name="CategoryAPI"),

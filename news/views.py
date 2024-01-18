@@ -8,8 +8,11 @@ import random
 from rest_framework.decorators import (api_view, permission_classes, authentication_classes)
 from rest_framework.permissions import IsAuthenticated
 from account.models import CustomUser
-from news.models import Post, Category
-from news.serializers import PostSerializer, CategorySerializer, PostAttachmentSerializer
+from news.models import Post, Category, PostRating
+from news.serializers import (PostSerializer,
+                              CategorySerializer,
+                              PostAttachmentSerializer,
+                              PostRatingSerializer)
 import traceback
 from account.helper import email_template
 from account import helper
@@ -293,3 +296,48 @@ class CategoryAPIView(APIView):
           "error": f'Error is {e}',
           'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
         })
+
+
+class PostRatingAPIView(APIView):
+  permission_classes=[IsAuthenticated]
+  authentication_classes = [JWTAuthentication]
+
+  @method_decorator(helpers.admin_only)
+  def post(self, request, id):
+
+    try:
+      print(request.data)
+      data = request.data
+      data['user'] = request.user.id
+      post = Post.objects.filter(id=id).first()
+      data['post'] = post.id
+      print("data", data)
+      if post is not None:
+        serializer = PostRatingSerializer(data=data)
+        if serializer.is_valid():
+          serializer.save()
+          return Response({
+            "success": True,
+            "message": "Rating added successfully",
+            "error": False,
+            "data": serializer.data
+          }, status=status.HTTP_200_OK)
+        else:
+          return Response({
+            "success": False,
+            "message": "Failed to add rating ",
+            "error": True,
+            "dte": serializer.errors
+          }, status=status.HTTP_200_OK)
+      else:
+        return Response({
+            "success": False,
+            "message": "Invalid post id",
+            "error": True,
+          }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+          "error": f'Error is {e}',
+          'trackback': "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        })
+
