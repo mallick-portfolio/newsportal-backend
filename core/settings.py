@@ -94,9 +94,20 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://newsportal_t1mz_user:iYh8xQspEHAELpnR2C1gz4ZQq9Lhbzsw@dpg-cmla756g1b2c73fuejig-a/newsportal_t1mz',
+        default='postgres://newsportal_t1mz_user:iYh8xQspEHAELpnR2C1gz4ZQq9Lhbzsw@dpg-cmla756g1b2c73fuejig-a.oregon-postgres.render.com/newsportal_t1mz',
     )
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'yourdb',
+#         'USER': 'youruser',
+#         'PASSWORD': 'yourpass',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432'
+#     }
+# }
 
 # DATABASES = {
 #     'default': {
