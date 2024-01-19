@@ -33,7 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*', 'newsportal-hdb5.onrender.com']
 CORS_ALLOWED_ORIGINS = [
-
+    'https://newsportal-hdb5.onrender.com',
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5000",
 ]
