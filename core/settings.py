@@ -37,7 +37,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5000",
 ]
-CORS_ALLOW_ALL_ORIGINS=True
+CSRF_TRUSTED_ORIGINS  = [
+    'https://newsportal-hdb5.onrender.com',
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5000",
+]
+CORS_ALLOW_ALL_ORIGINS=['https://newsportal-hdb5.onrender.com']
 # Application definition
 
 INSTALLED_APPS = [
