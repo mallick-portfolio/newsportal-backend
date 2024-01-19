@@ -54,7 +54,7 @@ class RegistrationAPIView(APIView):
         user = serializer.save()
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.id))
-        confirm_link = f"{settings.BACKEND_DOMAIN}/api/v1/account/active/{uid}/{token}"
+        confirm_link = f"https://newsportal-hdb5.onrender.com/api/v1/account/active/{uid}/{token}"
         email_data = {}
         email_data['confirm_link'] = confirm_link
         email_template(email, email_data, 'Verify email address', './email/verify_email.html')
