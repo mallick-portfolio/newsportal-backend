@@ -34,8 +34,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://newsportal-hdb5.onrender.com',
-                        "http://127.0.0.1:3000",
-                        "http://127.0.0.1:5000",]
+                        "https://newsportal-tan.vercel.app",
+                        "http://127.0.0.1:5000",
+                        "http://127.0.0.1:5000",
+                        ]
 
 # ALLOWED_HOSTS = ['newsportal-hdb5.onrender.com']
 # CORS_ALLOWED_ORIGINS = [
