@@ -20,9 +20,12 @@ from news import helpers
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from account.helper import email_template
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 class PostAttachmentAPIView(APIView):
+  @csrf_exempt
   def post(self, request):
     try:
       data = request.data
@@ -82,6 +85,7 @@ class NewsAPIView(APIView):
         })
 
   @method_decorator(helpers.admin_only)
+  @csrf_exempt
   def post(self, request):
     try:
       data = request.data
@@ -111,6 +115,7 @@ class NewsAPIView(APIView):
 
 
   @method_decorator(helpers.admin_only)
+  @csrf_exempt
   def put(self, request, id):
     try:
       post = Post.objects.filter(id=id).first()
@@ -144,6 +149,7 @@ class NewsAPIView(APIView):
 
 
   @method_decorator(helpers.admin_only)
+  @csrf_exempt
   def delete(self, request, id):
     try:
       post = Post.objects.filter(id=id).first()
@@ -253,6 +259,7 @@ class CategoryAPIView(APIView):
         })
 
   @method_decorator(helpers.admin_only)
+  @csrf_exempt
   def post(self, request):
     try:
       serializer = CategorySerializer(data=request.data)
@@ -278,6 +285,7 @@ class CategoryAPIView(APIView):
 
 
   @method_decorator(helpers.admin_only)
+  @csrf_exempt
   def delete(self, request, id):
     try:
       category = Category.objects.filter(id=id).first()
@@ -305,7 +313,7 @@ class PostRatingAPIView(APIView):
   permission_classes=[IsAuthenticated]
   authentication_classes = [JWTAuthentication]
 
-
+  @csrf_exempt
   def post(self, request, id):
 
     try:

@@ -17,6 +17,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from account import helper
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
 
 @api_view(['GET'])
 def activate(request, uid64, token):
@@ -45,6 +47,7 @@ def activate(request, uid64, token):
 
 
 class RegistrationAPIView(APIView):
+  @csrf_exempt
   def post(self, request):
     try:
       data = request.data
@@ -80,6 +83,7 @@ class RegistrationAPIView(APIView):
 
 
 class LoginAPIView(APIView):
+  @csrf_exempt
   def post(self, request):
     try:
       rd = request.data
@@ -113,6 +117,7 @@ class LoginAPIView(APIView):
 class LogoutAPIView(APIView):
   permission_classes = [IsAuthenticated]
   authentication_classes =[JWTAuthentication]
+  @csrf_exempt
   def post(self, request):
     logout(request)
     return Response({
