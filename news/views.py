@@ -19,6 +19,7 @@ from account import helper
 from news import helpers
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
+from account.helper import email_template
 
 
 class PostAttachmentAPIView(APIView):
@@ -181,8 +182,10 @@ class PublicPostAPIView(APIView):
           }, status=status.HTTP_200_OK)
       else:
         category = request.query_params.get('category')
+        print("category", category)
         if category is not None:
-          posts = Post.objects.filter(category__name=category)
+          posts = Post.objects.filter(category__slug=category)
+          print("posts", posts)
         else:
           posts = Post.objects.all()
         data = PostSerializer(posts, many=True).data
@@ -302,20 +305,22 @@ class PostRatingAPIView(APIView):
   permission_classes=[IsAuthenticated]
   authentication_classes = [JWTAuthentication]
 
-  @method_decorator(helpers.admin_only)
+
   def post(self, request, id):
 
     try:
-      print(request.data)
+
       data = request.data
       data['user'] = request.user.id
       post = Post.objects.filter(id=id).first()
       data['post'] = post.id
-      print("data", data)
+      print(data)
+
       if post is not None:
         serializer = PostRatingSerializer(data=data)
         if serializer.is_valid():
           serializer.save()
+          email_template(request.user.email, "email_data", 'Post rating', './email/post_rating.html')
           return Response({
             "success": True,
             "message": "Rating added successfully",
