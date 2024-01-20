@@ -18,13 +18,13 @@ class PostAttachment(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
 
 class Post(models.Model):
-  title = models.CharField(max_length=255)
+  title = models.TextField(blank=True, null=True)
   slug =  models.SlugField(null=True, blank=True, unique=True)
   description = models.TextField()
   rating = models.IntegerField(blank=True, null=True)
   author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='news')
   category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='news_category')
-  image_url = models.CharField(max_length=255, blank=True, null=True)
+  image_url = models.TextField(blank=True, null=True)
 
   created_at = models.DateTimeField(auto_now_add=True)
   published_at = models.DateTimeField(blank=True, null=True)
